@@ -28,3 +28,4 @@ and this project adheres to
 - Readable generated type names derived from the parent type and property,
   e.g. `ConversationCompleteRequestMessageType`.
 - `examples/cli` and `examples/swiftui-chat`.
+- Released under the ISC license.
