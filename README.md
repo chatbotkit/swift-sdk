@@ -349,3 +349,7 @@ Consumers then pick up the new version through SwiftPM:
 
 While the API is still evolving the package stays on `0.x` (minor versions may
 introduce breaking changes); it will move to `1.0.0` once the API is stable.
+
+## License
+
+ISC. See [LICENSE](LICENSE) for details.
