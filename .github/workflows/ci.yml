@@ -1,0 +1,77 @@
+# Continuous Integration for the swift-sdk.
+#
+# Builds and tests the package on Linux (Swift toolchain containers) and on
+# macOS (Xcode toolchain), and builds the examples on the platforms they target.
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - next
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+  # @note no paths-ignore on pull requests: a docs-only release PR must still
+  # report the checks that the ship flow (and the main ruleset) wait for
+  pull_request:
+    branches:
+      - main
+      - next
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux (Swift ${{ matrix.swift }})
+    runs-on: ubuntu-latest
+    container: swift:${{ matrix.swift }}
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ['6.0', '6.2']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: No unchecked Sendable in Sources
+        run: |
+          if grep -rn "@unchecked Sendable" Sources; then
+            exit 1
+          fi
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+      - name: Build CLI example
+        run: swift build --package-path examples/cli
+
+      - name: Test SwiftUI example logic
+        run: swift test --package-path examples/swiftui-chat
+
+  macos:
+    name: macOS
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+      - name: Build CLI example
+        run: swift build --package-path examples/cli
+
+      - name: Build and test SwiftUI example
+        run: swift test --package-path examples/swiftui-chat
